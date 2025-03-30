@@ -1,0 +1,25 @@
+---
+title: "Dummy"
+author: "None"
+date: "2025"
+format:
+  pdf:
+    pdf-engine: xelatex
+    keep-tex: true
+    includes-in-header: portada.tex
+    toc: false
+    number-sections: false
+fontsize: 11.8pt
+documentclass: extreport
+header-includes:
+  - '\usepackage[a4paper, margin=1.2in]{geometry}'
+  - '\usepackage{graphicx}'
+  - '\usepackage{float}'
+  - '\usepackage{anyfontsize}'
+  - '\usepackage{titling}'
+  - '\usepackage{fancyhdr}'
+  - '\pagestyle{empty}'
+---
+
+```{=latex}
+\maketitle
