@@ -988,3 +988,17 @@ Notar que esta última estrategia de complementariedad no siempre será recomend
 Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis cluster para dividir todos los Pokémon en grupos generales por sus características más importantes. Apoyándonos de esto y de las distancias entre individuos, con un procedimiento similar al clustering jerarquizado, hemos conseguido definir un método con las estrategias vistas en clase que permite recomendar a un jugador inexperto varios Pokémon que pueden encajar bien dentro de un equipo incompleto. Aunque se haya hecho de manera más simplificada, es algo indudablemente útil en la construcción de equipos de 6 Pokémon, que pueden usarse para avanzar más rápido en los videojuegos o incluso participar en torneos competitivos con equipos que garanticen un buen rendimiento.
 
 # 5. Regresión Lineal Múltiple
+
+Ideas:
+
+-   Hacer regresor lineal para predecir una variable en función del resto.
+
+-   Entrenarlo dividiendo los Pokémon en un conjunto de training y otro de test.
+
+-   Aplicar método de selección de regresores backward para quitar variables -\> quitaremos la de "total" fácilmente.
+
+-   Validar el modelo comprobando brevemente que se cumplen las condiciones del punto 4 de la práctica.
+
+-   Validar el conjunto de test -\> puede ser simplemente unos Pokémon que coja yo por gusto para ver si se predicen bien. Medir error y representarlo, ofrecer intervalos de confianza, etc.
+
+-   Añadir regresión polinomial con el programilla que hizo Brahim.
