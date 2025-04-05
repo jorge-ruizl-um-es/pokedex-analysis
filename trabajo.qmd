@@ -1,5 +1,5 @@
 ---
-title: 'Análisis estadístico de la Pokédex global'
+title: 'Análisis estadístico de la Pokédex nacional'
 author: 'Jorge Ruiz López'
 date: '01-23-2025'
 format:
@@ -991,8 +991,6 @@ Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis cluste
 
 Ideas:
 
--   Hacer regresor lineal para predecir una variable en función del resto.
-
 -   Entrenarlo dividiendo los Pokémon en un conjunto de training y otro de test.
 
 -   Aplicar método de selección de regresores backward para quitar variables -\> quitaremos la de "total" fácilmente.
@@ -1001,4 +999,12 @@ Ideas:
 
 -   Validar el conjunto de test -\> puede ser simplemente unos Pokémon que coja yo por gusto para ver si se predicen bien. Medir error y representarlo, ofrecer intervalos de confianza, etc.
 
--   Añadir regresión polinomial con el programilla que hizo Brahim.
+En este último apartado, aplicaremos técnicas de regresión lineal múltiple para tratar de construir un predictor de alguna característica numérica de relevancia para el estudio de los Pokémon. La primera cuestión es la elección de la variable respuesta, que queremos estimar mediante el modelo a proponer. Para ello, teniendo en cuenta las relaciones lineales de las variables estudiadas mediante el coeficiente de correlación lineal y los diagramas de dispersión por pares, tendría sentido elegir una que tenga alta correlación con las demás en general. No obstante, debemos aplicar también el sentido común para que la variable a predecir pueda tener una utilidad práctica dentro del ámbito del universo Pokémon (aplicación táctica a combates, construcción de un equipo...).
+
+IDEAS:
+
+-   Quizás implementar un regresor lineal no tiene mucho interés de cara al estudio que estoy haciendo $\rightarrow$ No tiene mucha aplicación práctica más allá de conocer relaciones entre variables.
+
+-   Queda pendiente ver si podría implementar un regresor logístico para varias clases, de forma que podría predecir el tipo de un Pokémon o su categoría. Aún más allá, podría incluso recuperar los grupos obtenidos con el clustering aglomerativo, y usarlos para predecir a cuál podría pertenecer cada Pokémon, sabiendo las características de cada grupo.
+
+-   Esto podría implicar la construcción de una herramienta automatizada que clasifica Pokémon de forma eficiente. Por ejemplo, podría implementarse en un sistema de búsqueda inteligente, en el que usuarios pueden buscar unas ciertas estadísticas, y obtener Pokémon que se ajustan a ellas.
