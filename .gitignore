@@ -1,0 +1,2 @@
+# Ignore .RHistory automatically generated when editing the Quarto document in RStudio
+*.Rhistory*
