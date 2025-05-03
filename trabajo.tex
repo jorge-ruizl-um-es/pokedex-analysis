@@ -4,7 +4,7 @@
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
-  11.8pt,
+  12pt,
 ]{extreport}
 
 \usepackage{amsmath,amssymb}
@@ -212,7 +212,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={Análisis estadístico de la Pokédex global},
+  pdftitle={Análisis estadístico de la Pokédex nacional},
   pdfauthor={Jorge Ruiz López},
   colorlinks=true,
   linkcolor={blue},
@@ -222,7 +222,7 @@
   pdfcreator={LaTeX via pandoc}}
 
 
-\title{Análisis estadístico de la Pokédex global}
+\title{Análisis estadístico de la Pokédex nacional}
 \author{Jorge Ruiz López}
 \date{2025-01-23}
 
@@ -260,6 +260,8 @@
   4.2. Caso práctico
 
   4.3. Conclusiones
+\item
+  Regresión Lineal Múltiple
 \end{enumerate}
 
 \chapter{1. Introducción y contexto}\label{introducciuxf3n-y-contexto}
@@ -267,8 +269,8 @@
 En el presente documento, analizaremos exhaustivamente el conjunto de
 datos en cuestión es una versión en formato CSV de la base de datos
 relacional que contiene los datos de 1025 especies de Pokémon (criaturas
-de la franquicia de videojuegos homónima). Aplicaremos sobre él las
-técnicas de análisis multivariante trabajadas en clase.
+de la franquicia de videojuegos homónima). Aplicaremos sobre él diversas
+técnicas de análisis multivariante.
 
 Para cada observación de una especie de Pokémon, nuestro dataset ofrece
 información sobre 14 variables. Debido a las distintas naturalezas de
@@ -1572,14 +1574,13 @@ de verlo necesario.
 
 \section{4.2. Caso práctico}\label{caso-pruxe1ctico}
 
-Para darle una nueva dimensión a esta técnica, y buscando poner en
-práctica lo trabajado en clase mediante un ejemplo real, vamos a
-realizar el análisis cluster enfocándonos en un problema concreto.
-Imaginemos que un jugador dispone de todos los Pokémon en la Pokédex
-para construir un equipo, pero sólo tiene claro que quiere incluir
-ciertas especies en concreto. Sería interesante implementar un sistema
-de recomendación automática de Pokémon para autocompletar un equipo, que
-típicamente viene formado por 6 criaturas.
+Para darle una nueva dimensión a esta técnica, vamos a realizar el
+análisis cluster enfocándonos en un problema concreto. Imaginemos que un
+jugador dispone de todos los Pokémon en la Pokédex para construir un
+equipo, pero sólo tiene claro que quiere incluir ciertas especies en
+concreto. Sería interesante implementar un sistema de recomendación
+automática de Pokémon para autocompletar un equipo, que típicamente
+viene formado por 6 criaturas.
 
 El objetivo de este apartado será, a partir de un ejemplo concreto,
 detallar el proceso que se seguiría para conseguir una lista de
@@ -2163,15 +2164,114 @@ Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis
 cluster para dividir todos los Pokémon en grupos generales por sus
 características más importantes. Apoyándonos de esto y de las distancias
 entre individuos, con un procedimiento similar al clustering
-jerarquizado, hemos conseguido definir un método con las estrategias
-vistas en clase que permite recomendar a un jugador inexperto varios
-Pokémon que pueden encajar bien dentro de un equipo incompleto. Aunque
-se haya hecho de manera más simplificada, es algo indudablemente útil en
-la construcción de equipos de 6 Pokémon, que pueden usarse para avanzar
-más rápido en los videojuegos o incluso participar en torneos
-competitivos con equipos que garanticen un buen rendimiento.
+jerarquizado, hemos conseguido definir un método que permite recomendar
+a un jugador inexperto varios Pokémon que pueden encajar bien dentro de
+un equipo incompleto. Aunque se haya hecho de manera más simplificada,
+es algo indudablemente útil en la construcción de equipos de 6 Pokémon,
+que pueden usarse para avanzar más rápido en los videojuegos o incluso
+participar en torneos competitivos con equipos que garanticen un buen
+rendimiento.
 
-\chapter{5. Lo que sea}\label{lo-que-sea}
+\chapter{5. Regresión
+Logística/Multinomial}\label{regresiuxf3n-loguxedsticamultinomial}
+
+En este último apartado, aplicaremos técnicas de regresión logística
+para tratar de construir un clasificador de Pokémon en base a alguna
+variable categórica que nos permita agruparlos. La diferencia con el
+clustering aplicado anteriormente es que este método es supervisado, por
+lo que, por primera vez en el documento, podemos recurrir a variables
+con las que no habíamos podido trabajar. Dado que no disponemos de
+variables binarias, el modelo que aplicaremos será, en concreto, un
+regresor multinomial, puesto que admite variables discretas
+(categóricas) que tomen tantos valores distintos como sea preciso. Si la
+variable elegida como \emph{target} toma \(d\) valores, esta técnica nos
+permitirá obtener \(d-1\) regresores logísticos.
+
+Se ha optado por este enfoque debido a que, por cómo funcionan
+normalmente los juegos de Pokémon, es muy inusual tener la información
+de todas las estadísticas numéricas de un espécimen menos una. Es por
+ello que se ha considerado que la regresión lineal no tendría mucha
+relevancia en el estudio. No obstante, el hecho de trabajar con clases
+sí puede ser interesante. Es muy común que dispongamos de todos los
+datos numéricos de un Pokémon, pero queramos saber de alguna forma
+ciertas características categóricas (o incluso queramos estudiar si hay
+relación entre las variables numéricas y categóricas).
+
+La primera cuestión es la elección de la variable respuesta
+(\emph{target}), que querremos estimar mediante el modelo a proponer.
+Dado que, hasta el momento, no se le ha dado a la variable
+\texttt{primary\_type} la importancia que merece dentro del universo
+Pokémon, vamos a definirla como variable de respuesta. Así, el regresor
+que procedemos a entrenar puede permitirnos construir una herramiento
+automatizada de clasificación eficiente de Pokémon. Por ejemplo, podría
+implementarse un sistema de búsqueda inteligente en el que el usuario
+introduce las características requeridas para un Pokémon, y se le
+devuelve el tipo que mejor tiende a ajustarse a ellas.
+
+Por supuesto, esto solo tendrá utilidad en el caso de que el regresor
+funcione correctamente. Para ello, los grupos que se formen al separar
+por tipos tendrán que ser lo suficientemente distintos entre sí para que
+haya diferencias; y tendrá que haber algún tipo de dependencia o
+relación entre el tipo y el resto de variables. Podremos observar esto
+al medir el rendimiento del modelo que obtengamos, puesto que, si no
+funciona correctamente, es posible que se deba a que no existe
+suficiente relación entre el tipo y las otras variables.
+
+\section{5.1. Tratamiento de los datos}\label{tratamiento-de-los-datos}
+
+Dado que estamos en aprendizaje supervisado y contamos con un dataset
+con muchos datos, es convieniente hacer una división en conjunto de
+entranamiento y conjunto de test (\emph{train-test split}). Esto nos
+será de utilidad para que, una vez tengamos el modelo entrenado con el
+\emph{training dataset}, podamos validarlo de forma efectiva y no
+sesgada mediante el \emph{test dataset}. También nos permitirá estudiar
+si el modelo padece de sobreajuste.
+
+La división entre \emph{training} y \emph{test} la haremos de un 80-20.
+Es decir, reservaremos el 20\% de la Pokédex (seleccionado de forma
+aleatoria) para evaluación del rendimiento. Mostramos algunos Pokémon
+que caen en la partición de \emph{training}, y otros que caigan en la de
+\emph{test}.
+
+\begin{table}[H]
+\centering
+\caption{Pokémon de entrenamiento}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{lllllr}
+\toprule
+  & name & primary\_type & generation & category & total\_base\_stats\\
+\midrule
+\cellcolor{gray!10}{332} & \cellcolor{gray!10}{cacturne} & \cellcolor{gray!10}{grass} & \cellcolor{gray!10}{gen 3} & \cellcolor{gray!10}{regular} & \cellcolor{gray!10}{475}\\
+250 & ho-oh & fire & gen 2 & legendary & 680\\
+\cellcolor{gray!10}{429} & \cellcolor{gray!10}{mismagius} & \cellcolor{gray!10}{ghost} & \cellcolor{gray!10}{gen 4} & \cellcolor{gray!10}{regular} & \cellcolor{gray!10}{495}\\
+435 & skuntank & poison & gen 4 & regular & 479\\
+\cellcolor{gray!10}{849} & \cellcolor{gray!10}{toxtricity} & \cellcolor{gray!10}{electric} & \cellcolor{gray!10}{gen 8} & \cellcolor{gray!10}{regular} & \cellcolor{gray!10}{502}\\
+\addlinespace
+254 & sceptile & grass & gen 3 & regular & 530\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Pokémon de test}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{lllllr}
+\toprule
+  & name & primary\_type & generation & category & total\_base\_stats\\
+\midrule
+\cellcolor{gray!10}{3} & \cellcolor{gray!10}{venusaur} & \cellcolor{gray!10}{grass} & \cellcolor{gray!10}{gen 1} & \cellcolor{gray!10}{regular} & \cellcolor{gray!10}{525}\\
+6 & charizard & fire & gen 1 & regular & 534\\
+\cellcolor{gray!10}{12} & \cellcolor{gray!10}{butterfree} & \cellcolor{gray!10}{bug} & \cellcolor{gray!10}{gen 1} & \cellcolor{gray!10}{regular} & \cellcolor{gray!10}{395}\\
+22 & fearow & normal & gen 1 & regular & 442\\
+\cellcolor{gray!10}{23} & \cellcolor{gray!10}{ekans} & \cellcolor{gray!10}{poison} & \cellcolor{gray!10}{gen 1} & \cellcolor{gray!10}{regular} & \cellcolor{gray!10}{288}\\
+\addlinespace
+25 & pikachu & electric & gen 1 & regular & 320\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 

@@ -7,7 +7,7 @@ format:
     latex-engine: tinytex
     pdf-engine: xelatex
     keep-tex: true
-fontsize: 11.8pt
+fontsize: 12pt
 documentclass: extreport
 
 # Paquetes de LaTeX para mejorar visualización en PDF
@@ -989,22 +989,40 @@ Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis cluste
 
 # 5. Regresión Logística/Multinomial
 
-Ideas:
-
--   Entrenarlo dividiendo los Pokémon en un conjunto de training y otro de test.
-
--   Aplicar método de selección de regresores backward para quitar variables -\> quitaremos la de "total" fácilmente.
-
--   Validar el conjunto de test -\> puede ser simplemente unos Pokémon que coja yo por gusto para ver si se predicen bien. Medir error y representarlo, ofrecer intervalos de confianza, etc.
-
 En este último apartado, aplicaremos técnicas de regresión logística para tratar de construir un clasificador de Pokémon en base a alguna variable categórica que nos permita agruparlos. La diferencia con el clustering aplicado anteriormente es que este método es supervisado, por lo que, por primera vez en el documento, podemos recurrir a variables con las que no habíamos podido trabajar. Dado que no disponemos de variables binarias, el modelo que aplicaremos será, en concreto, un regresor multinomial, puesto que admite variables discretas (categóricas) que tomen tantos valores distintos como sea preciso. Si la variable elegida como *target* toma $d$ valores, esta técnica nos permitirá obtener $d-1$ regresores logísticos.
 
-La primera cuestión es la elección de la variable respuesta, que querremos estimar mediante el modelo a proponer. Para ello, teniendo en cuenta las relaciones lineales de las variables estudiadas mediante el coeficiente de correlación lineal y los diagramas de dispersión por pares, tendría sentido elegir una que tenga alta correlación con las demás en general. No obstante, debemos aplicar también el sentido común para que la variable a predecir pueda tener una utilidad práctica dentro del ámbito del universo Pokémon (aplicación táctica a combates, construcción de un equipo...).
+Se ha optado por este enfoque debido a que, por cómo funcionan normalmente los juegos de Pokémon, es muy inusual tener la información de todas las estadísticas numéricas de un espécimen menos una. Es por ello que se ha considerado que la regresión lineal no tendría mucha relevancia en el estudio. No obstante, el hecho de trabajar con clases sí puede ser interesante. Es muy común que dispongamos de todos los datos numéricos de un Pokémon, pero queramos saber de alguna forma ciertas características categóricas (o incluso queramos estudiar si hay relación entre las variables numéricas y categóricas).
 
-IDEAS:
+La primera cuestión es la elección de la variable respuesta (*target*), que querremos estimar mediante el modelo a proponer. Dado que, hasta el momento, no se le ha dado a la variable `primary_type` la importancia que merece dentro del universo Pokémon, vamos a definirla como variable de respuesta. Así, el regresor que procedemos a entrenar puede permitirnos construir una herramiento automatizada de clasificación eficiente de Pokémon. Por ejemplo, podría implementarse un sistema de búsqueda inteligente en el que el usuario introduce las características requeridas para un Pokémon, y se le devuelve el tipo que mejor tiende a ajustarse a ellas.
 
--   Quizás implementar un regresor lineal no tiene mucho interés de cara al estudio que estoy haciendo $\rightarrow$ No tiene mucha aplicación práctica más allá de conocer relaciones entre variables.
+Por supuesto, esto solo tendrá utilidad en el caso de que el regresor funcione correctamente. Para ello, los grupos que se formen al separar por tipos tendrán que ser lo suficientemente distintos entre sí para que haya diferencias; y tendrá que haber algún tipo de dependencia o relación entre el tipo y el resto de variables. Podremos observar esto al medir el rendimiento del modelo que obtengamos, puesto que, si no funciona correctamente, es posible que se deba a que no existe suficiente relación entre el tipo y las otras variables.
 
--   Queda pendiente ver si podría implementar un regresor logístico para varias clases, de forma que podría predecir el tipo de un Pokémon o su categoría. Aún más allá, podría incluso recuperar los grupos obtenidos con el clustering aglomerativo, y usarlos para predecir a cuál podría pertenecer cada Pokémon, sabiendo las características de cada grupo.
+## 5.1. Tratamiento de los datos
 
--   Esto podría implicar la construcción de una herramienta automatizada que clasifica Pokémon de forma eficiente. Por ejemplo, podría implementarse en un sistema de búsqueda inteligente, en el que usuarios pueden buscar unas ciertas estadísticas, y obtener Pokémon que se ajustan a ellas.
+Dado que estamos en aprendizaje supervisado y contamos con un dataset con muchos datos, es convieniente hacer una división en conjunto de entranamiento y conjunto de test (*train-test split*). Esto nos será de utilidad para que, una vez tengamos el modelo entrenado con el *training dataset*, podamos validarlo de forma efectiva y no sesgada mediante el *test dataset*. También nos permitirá estudiar si el modelo padece de sobreajuste.
+
+La división entre *training* y *test* la haremos de un 80-20. Es decir, reservaremos el 20% de la Pokédex (seleccionado de forma aleatoria) para evaluación del rendimiento. Mostramos algunos Pokémon que caen en la partición de *training*, y otros que caigan en la de *test*.
+
+```{r}
+#| echo: false
+
+# La semilla ya la hemos fijado antes
+
+trainIndex <- sample(1:nrow(d), 0.8*nrow(d))
+trainData <- d[trainIndex, ]
+testData <- d[-trainIndex, ]
+```
+
+```{r}
+#| echo: false
+
+kable(head(trainData[,1:5]), format = "latex", caption = "Pokémon de entrenamiento", booktabs = TRUE) %>%
+  kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
+```
+
+```{r}
+#| echo: false
+
+kable(head(testData[,1:5]), format = "latex", caption = "Pokémon de test", booktabs = TRUE) %>%
+  kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
+```
