@@ -2223,15 +2223,8 @@ suficiente relación entre el tipo y las otras variables.
 Antes de nada, debemos pasar las variables: \texttt{generation} y
 \texttt{category} a tipo ``factor'' para poder tratarlas como variables
 categóricas, dado que son variables que usaremos como predictores y que
-toman valores de tipo cadena de texto.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{d\_regresion }\OtherTok{\textless{}{-}}\NormalTok{ d[,}\DecValTok{2}\SpecialCharTok{:}\DecValTok{11}\NormalTok{]}
-\NormalTok{d\_regresion}\SpecialCharTok{$}\NormalTok{category }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(d\_regresion}\SpecialCharTok{$}\NormalTok{category)}
-\NormalTok{d\_regresion}\SpecialCharTok{$}\NormalTok{generation }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(d\_regresion}\SpecialCharTok{$}\NormalTok{generation)}
-\end{Highlighting}
-\end{Shaded}
+toman valores de tipo cadena de texto. La variable \emph{target}
+\texttt{primary\_type} también tendrá que ser convertida a ``factor''.
 
 Dado que estamos en aprendizaje supervisado y contamos con un dataset
 con muchos datos, es convieniente hacer una división en conjunto de
@@ -2303,6 +2296,75 @@ suma es mayor. Observando las medianas, cerca de estos últimos se
 encontrarían los Pokémon de tipo dragón o volador. Parece que las
 pequeñas tendencias observadas tienen sentido. Es decir, es razonable
 pensar que puede haber cierta relación entre el tipo y las estadísticas.
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=2.39583in,height=\textheight]{trabajo_images/charizard.jpeg}
+
+}
+
+\caption{Figura de Charizard a escala en el Pokémon Center de Tokio
+(Japón). Charizard es un Pokémon de primera generación que hemos
+obtenido como parte del conjunto de test.}
+
+\end{figure}%
+
+\section{5.2. Entrenamiento del modelo}\label{entrenamiento-del-modelo}
+
+Comenzamos entrenando el modelo con todas las variables de las que
+disponemos. Cabe mencionar que, como hemos ``factorizado'' las de
+generación y categoría, se introducirán tantas variables \emph{dummy}
+como valores (menos uno) tome cada una. Como se trata de regresión
+multinomial, hemos de definir una clase de referencia en la variable
+respuesta. Parece razonable establecer el tipo ``normal'' como clase de
+referencia, dado que podríamos decir que es el ``neutro'' y no está
+asociado a ningún elemento ni concepto en específico.
+
+A continuación, entrenamos el modelo. Como hay 18 valores posibles para
+el tipo, terminaremos con 17 modelos de regresión logística, cada uno
+con 9 variables (predictores) más las que resulten de pasar las
+categóricas a dummy. Por tanto, no conviene imprimir el resumen con los
+resultados, dado que es tan extenso que no se distingue nada.
+
+Como obtenemos modelos muy complejos, lo más urgente que debemos hacer
+ahora es aplicar métodos de selección de regresores, para ver si podemos
+reducir la dimensionalidad del modelo y quedarnos solo con los
+predictores más relevantes. Vamos a aplicar el método \emph{backward},
+con el que hemos obtenido buenos resultados tras algunas pruebas.
+También se podrían haber aplicado \emph{forward} o \emph{stepwise}.
+
+Podemos imprimir tras la aplicación del método de selección de
+regresores los nombres de las variables con las que ahora opera el
+modelo, para las cuales obtenemos coeficientes:
+
+\begin{verbatim}
+[1] "(Intercept)"      "total_base_stats" "hp"               "attack"          
+[5] "defense"          "special_attack"   "special_defense"  "speed"           
+\end{verbatim}
+
+Observamos que nos quedamos únicamente con las variables numéricas, y se
+eliminan todas las \emph{dummies} que han surgido de los dos predictores
+categóricos. Por tanto, podemos afirmar que las variables
+\texttt{generation} y \texttt{category} no tienen especial influencia en
+el tipo del Pokémon, como puede ser comprensible (el juego en el que
+primero haya aparecido el Pokémon o su categoría no deberían tener
+relación con el tipo).
+
+Así, obtenemos como resultado 17 modelos, uno por cada clase que no sea
+la de refencia. Cada uno explica el logaritmo de las odds de pertenecer
+a un tipo concreto frente a pertenecer al normal. Además, las variables
+que influyen en cada uno de estos modelos son las numéricas (``total'',
+puntos de salud, ataque, etc.).
+
+\section{5.3. Validación del modelo}\label{validaciuxf3n-del-modelo}
+
+Para este apartado, vamos a obtener predicciones con el modelo
+entrenado, tanto en instancias de entrenamiento como de test. Así,
+podremos ver su funcionamiento tanto con los datos con los que se ha
+construido, como con otros datos desconocidos (pero para los cuales
+tenemos sus valores reales del tipo). El objetivo es estudiar si el
+modelo ofrece buenas predicciones en general, o si, por el contrario,
+subajusta o sobreajusta.
 
 
 

@@ -1055,7 +1055,9 @@ d_regresion %>%
   ggplot(aes(x = primary_type, y = total_base_stats)) + 
   geom_boxplot(aes(color = primary_type)) +
   scale_x_discrete(labels = NULL) +  # Elimina las etiquetas del eje x
-  theme(axis.ticks.x = element_blank())  
+  theme(axis.ticks.x = element_blank()) +
+  theme(legend.text = element_text(size = 9)) + 
+  theme(legend.position = "bottom")
 
 ```
 
