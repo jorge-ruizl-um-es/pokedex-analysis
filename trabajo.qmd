@@ -66,7 +66,7 @@ bookdown: true
 
 # 1. Introducción y contexto
 
-En el presente documento, analizaremos exhaustivamente el conjunto de datos en cuestión es una versión en formato CSV de la base de datos relacional que contiene los datos de 1025 especies de Pokémon (criaturas de la franquicia de videojuegos homónima). Aplicaremos sobre él las técnicas de análisis multivariante trabajadas en clase.
+En el presente documento, analizaremos exhaustivamente el conjunto de datos en cuestión es una versión en formato CSV de la base de datos relacional que contiene los datos de 1025 especies de Pokémon (criaturas de la franquicia de videojuegos homónima). Aplicaremos sobre él diversas técnicas de análisis multivariante.
 
 Para cada observación de una especie de Pokémon, nuestro dataset ofrece información sobre 14 variables. Debido a las distintas naturalezas de las características observables en un Pokémon, vamos a dividirlas en dos grupos:
 
@@ -680,7 +680,7 @@ Vemos, por tanto, que el cálculo e interpretación de las componentes principal
 
 ## 4.2. Caso práctico
 
-Para darle una nueva dimensión a esta técnica, y buscando poner en práctica lo trabajado en clase mediante un ejemplo real, vamos a realizar el análisis cluster enfocándonos en un problema concreto. Imaginemos que un jugador dispone de todos los Pokémon en la Pokédex para construir un equipo, pero sólo tiene claro que quiere incluir ciertas especies en concreto. Sería interesante implementar un sistema de recomendación automática de Pokémon para autocompletar un equipo, que típicamente viene formado por 6 criaturas.
+Para darle una nueva dimensión a esta técnica, vamos a realizar el análisis cluster enfocándonos en un problema concreto. Imaginemos que un jugador dispone de todos los Pokémon en la Pokédex para construir un equipo, pero sólo tiene claro que quiere incluir ciertas especies en concreto. Sería interesante implementar un sistema de recomendación automática de Pokémon para autocompletar un equipo, que típicamente viene formado por 6 criaturas.
 
 El objetivo de este apartado será, a partir de un ejemplo concreto, detallar el proceso que se seguiría para conseguir una lista de recomendaciones de Pokémon que se complementen o funcionen bien con unos pocos Pokémon dados. Conseguiremos esto valiéndonos del análisis cluster del dataset con todas las especies. A pesar de que se irá siguiendo el ejemplo, la idea es que exactamente el mismo procedimiento sea aplicable para cualquier caso, obteniendo finalmente un método relativamente fiable para aconsejar a un jugador cualquiera que no sepa cómo completar su equipo. Partiremos del equipo incompleto de 5 Pokémon formado por:
 
@@ -985,7 +985,7 @@ Notar que esta última estrategia de complementariedad no siempre será recomend
 
 ## 4.3. Conclusiones
 
-Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis cluster para dividir todos los Pokémon en grupos generales por sus características más importantes. Apoyándonos de esto y de las distancias entre individuos, con un procedimiento similar al clustering jerarquizado, hemos conseguido definir un método con las estrategias vistas en clase que permite recomendar a un jugador inexperto varios Pokémon que pueden encajar bien dentro de un equipo incompleto. Aunque se haya hecho de manera más simplificada, es algo indudablemente útil en la construcción de equipos de 6 Pokémon, que pueden usarse para avanzar más rápido en los videojuegos o incluso participar en torneos competitivos con equipos que garanticen un buen rendimiento.
+Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis cluster para dividir todos los Pokémon en grupos generales por sus características más importantes. Apoyándonos de esto y de las distancias entre individuos, con un procedimiento similar al clustering jerarquizado, hemos conseguido definir un método que permite recomendar a un jugador inexperto varios Pokémon que pueden encajar bien dentro de un equipo incompleto. Aunque se haya hecho de manera más simplificada, es algo indudablemente útil en la construcción de equipos de 6 Pokémon, que pueden usarse para avanzar más rápido en los videojuegos o incluso participar en torneos competitivos con equipos que garanticen un buen rendimiento.
 
 # 5. Regresión Lineal Múltiple
 
