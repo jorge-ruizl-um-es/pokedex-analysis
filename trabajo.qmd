@@ -987,7 +987,7 @@ Notar que esta última estrategia de complementariedad no siempre será recomend
 
 Por tanto, en este apartado hemos podido aplicar ambos tipos de análisis cluster para dividir todos los Pokémon en grupos generales por sus características más importantes. Apoyándonos de esto y de las distancias entre individuos, con un procedimiento similar al clustering jerarquizado, hemos conseguido definir un método que permite recomendar a un jugador inexperto varios Pokémon que pueden encajar bien dentro de un equipo incompleto. Aunque se haya hecho de manera más simplificada, es algo indudablemente útil en la construcción de equipos de 6 Pokémon, que pueden usarse para avanzar más rápido en los videojuegos o incluso participar en torneos competitivos con equipos que garanticen un buen rendimiento.
 
-# 5. Regresión Lineal Múltiple
+# 5. Regresión Logística/Multinomial
 
 Ideas:
 
@@ -995,11 +995,11 @@ Ideas:
 
 -   Aplicar método de selección de regresores backward para quitar variables -\> quitaremos la de "total" fácilmente.
 
--   Validar el modelo comprobando brevemente que se cumplen las condiciones del punto 4 de la práctica.
-
 -   Validar el conjunto de test -\> puede ser simplemente unos Pokémon que coja yo por gusto para ver si se predicen bien. Medir error y representarlo, ofrecer intervalos de confianza, etc.
 
-En este último apartado, aplicaremos técnicas de regresión lineal múltiple para tratar de construir un predictor de alguna característica numérica de relevancia para el estudio de los Pokémon. La primera cuestión es la elección de la variable respuesta, que queremos estimar mediante el modelo a proponer. Para ello, teniendo en cuenta las relaciones lineales de las variables estudiadas mediante el coeficiente de correlación lineal y los diagramas de dispersión por pares, tendría sentido elegir una que tenga alta correlación con las demás en general. No obstante, debemos aplicar también el sentido común para que la variable a predecir pueda tener una utilidad práctica dentro del ámbito del universo Pokémon (aplicación táctica a combates, construcción de un equipo...).
+En este último apartado, aplicaremos técnicas de regresión logística para tratar de construir un clasificador de Pokémon en base a alguna variable categórica que nos permita agruparlos. La diferencia con el clustering aplicado anteriormente es que este método es supervisado, por lo que, por primera vez en el documento, podemos recurrir a variables con las que no habíamos podido trabajar. Dado que no disponemos de variables binarias, el modelo que aplicaremos será, en concreto, un regresor multinomial, puesto que admite variables discretas (categóricas) que tomen tantos valores distintos como sea preciso. Si la variable elegida como *target* toma $d$ valores, esta técnica nos permitirá obtener $d-1$ regresores logísticos.
+
+La primera cuestión es la elección de la variable respuesta, que querremos estimar mediante el modelo a proponer. Para ello, teniendo en cuenta las relaciones lineales de las variables estudiadas mediante el coeficiente de correlación lineal y los diagramas de dispersión por pares, tendría sentido elegir una que tenga alta correlación con las demás en general. No obstante, debemos aplicar también el sentido común para que la variable a predecir pueda tener una utilidad práctica dentro del ámbito del universo Pokémon (aplicación táctica a combates, construcción de un equipo...).
 
 IDEAS:
 
