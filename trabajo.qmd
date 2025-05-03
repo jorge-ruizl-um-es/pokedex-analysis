@@ -880,7 +880,7 @@ matriz_conf_df <- as.data.frame.matrix(matriz_confusion)
 
 # Imprimir
 kable(matriz_conf_df, format = "latex", caption = "Resumen de clasificación", booktabs = TRUE) %>%
-  kable_styling(latex_options = c("striped", "hold_position", "HOLD_position"))
+  kable_styling(font_size = 9, latex_options = c("striped", "hold_position", "HOLD_position"))
 ```
 
 Podemos observar que, por ejemplo, de los 228 Pokémon que hay en el grupo 3 (veloces y ofensivos), el método que hemos aplicado clasifica correctamente 220, lo cual es un porcentaje de acierto para este grupo (sensibilidad) de un 96,49%. El rendimiento general del modelo de clasificación (eficiencia o *accuracy*) se calcula obteniendo el porcentaje de acierto general, para las predicciones de todos los grupos. Obtenemos un valor de esta métrica del 97.17%. Todo esto nos lleva a pensar que el método aplicado tiene un muy buen rendimiento, de forma que clasifica casi de forma perfecta a los Pokémon en función de los grupos definidos en Kmeans.
@@ -999,6 +999,16 @@ Por supuesto, esto solo tendrá utilidad en el caso de que el regresor funcione 
 
 ## 5.1. Tratamiento de los datos
 
+Antes de nada, debemos pasar las variables: `generation` y `category` a tipo "factor" para poder tratarlas como variables categóricas, dado que son variables que usaremos como predictores y que toman valores de tipo cadena de texto. La variable *target* `primary_type` también tendrá que ser convertida a "factor".
+
+```{r}
+#| echo: false
+d_regresion <- d[,2:11]
+d_regresion$category <- factor(d_regresion$category)
+d_regresion$generation <- factor(d_regresion$generation)
+d_regresion$primary_type <- factor(d_regresion$primary_type)
+```
+
 Dado que estamos en aprendizaje supervisado y contamos con un dataset con muchos datos, es convieniente hacer una división en conjunto de entranamiento y conjunto de test (*train-test split*). Esto nos será de utilidad para que, una vez tengamos el modelo entrenado con el *training dataset*, podamos validarlo de forma efectiva y no sesgada mediante el *test dataset*. También nos permitirá estudiar si el modelo padece de sobreajuste.
 
 La división entre *training* y *test* la haremos de un 80-20. Es decir, reservaremos el 20% de la Pokédex (seleccionado de forma aleatoria) para evaluación del rendimiento. Mostramos algunos Pokémon que caen en la partición de *training*, y otros que caigan en la de *test*.
@@ -1010,7 +1020,9 @@ La división entre *training* y *test* la haremos de un 80-20. Es decir, reserva
 
 trainIndex <- sample(1:nrow(d), 0.8*nrow(d))
 trainData <- d[trainIndex, ]
+trainDataReg <- d_regresion[trainIndex, ]
 testData <- d[-trainIndex, ]
+testDataReg <- d_regresion[-trainIndex, ]
 ```
 
 ```{r}
@@ -1026,3 +1038,67 @@ kable(head(trainData[,1:5]), format = "latex", caption = "Pokémon de entrenamie
 kable(head(testData[,1:5]), format = "latex", caption = "Pokémon de test", booktabs = TRUE) %>%
   kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
 ```
+
+Además, para completar el estudio inicial y enfocarlo a la clasificación que queremos hacer, podemos representar los diagramas de caja de la variable "total" para los distintos tipos. Recurrimos en este caso a la librería `tidyverse` para usar comandos de `ggplot`, que facilita la representación en este tipo de situaciones donde la variable categórica toma muchos valores.
+
+```{r}
+#| echo: false
+#| output: false
+library("tidyverse")
+library("nnet")
+```
+
+```{r}
+#| echo: false
+
+d_regresion %>%
+  ggplot(aes(x = primary_type, y = total_base_stats)) + 
+  geom_boxplot(aes(color = primary_type)) +
+  scale_x_discrete(labels = NULL) +  # Elimina las etiquetas del eje x
+  theme(axis.ticks.x = element_blank())  
+
+```
+
+Podemos observar que no hay ningún atípico. Los Pokémon de tipo bicho ("bug") son los que tienden a tener una menor suma de estadísticas, mientras que el acero ("steel") destaca como uno de los tipos donde la suma es mayor. Observando las medianas, cerca de estos últimos se encontrarían los Pokémon de tipo dragón o volador. Parece que las pequeñas tendencias observadas tienen sentido. Es decir, es razonable pensar que puede haber cierta relación entre el tipo y las estadísticas.
+
+![Figura de Charizard a escala en el Pokémon Center de Tokio (Japón). Charizard es un Pokémon de primera generación que hemos obtenido como parte del conjunto de test.](trabajo_images/charizard.jpeg){alt="Mienshao, de tipo lucha. Observamos que, aparentemente, parece que encaja también en el estilo del equipo que teníamos, con Pokémon de apariencia ágil y gran capacidad ofensiva (cosa que sus estadísticas corroboran)." fig-cap="Pokémon Chansey y Blissey, destacables por su alto nivel de salud (hp)" fig-align="center" width="230"}
+
+## 5.2. Entrenamiento del modelo
+
+Comenzamos entrenando el modelo con todas las variables de las que disponemos. Cabe mencionar que, como hemos "factorizado" las de generación y categoría, se introducirán tantas variables *dummy* como valores (menos uno) tome cada una. Como se trata de regresión multinomial, hemos de definir una clase de referencia en la variable respuesta. Parece razonable establecer el tipo "normal" como clase de referencia, dado que podríamos decir que es el "neutro" y no está asociado a ningún elemento ni concepto en específico.
+
+A continuación, entrenamos el modelo. Como hay 18 valores posibles para el tipo, terminaremos con 17 modelos de regresión logística, cada uno con 9 variables (predictores) más las que resulten de pasar las categóricas a dummy. Por tanto, no conviene imprimir el resumen con los resultados, dado que es tan extenso que no se distingue nada.
+
+```{r}
+#| echo: false
+#| output: false
+
+trainDataReg$primary_type <- relevel(trainDataReg$primary_type, ref = "normal")
+modelo_multi <- multinom(primary_type ~ ., data=trainDataReg)
+summary(modelo_multi)
+```
+
+Como obtenemos modelos muy complejos, lo más urgente que debemos hacer ahora es aplicar métodos de selección de regresores, para ver si podemos reducir la dimensionalidad del modelo y quedarnos solo con los predictores más relevantes. Vamos a aplicar el método *backward*, con el que hemos obtenido buenos resultados tras algunas pruebas. También se podrían haber aplicado *forward* o *stepwise*.
+
+```{r}
+#| echo: false
+#| output: false
+modelo_backward <- step(modelo_multi, direction="backward")
+```
+
+Podemos imprimir tras la aplicación del método de selección de regresores los nombres de las variables con las que ahora opera el modelo, para las cuales obtenemos coeficientes:
+
+```{r}
+#| echo: false
+
+modelo_backward$coefnames
+
+```
+
+Observamos que nos quedamos únicamente con las variables numéricas, y se eliminan todas las *dummies* que han surgido de los dos predictores categóricos. Por tanto, podemos afirmar que las variables `generation` y `category` no tienen especial influencia en el tipo del Pokémon, como puede ser comprensible (el juego en el que primero haya aparecido el Pokémon o su categoría no deberían tener relación con el tipo).
+
+Así, obtenemos como resultado 17 modelos, uno por cada clase que no sea la de refencia. Cada uno explica el logaritmo de las odds de pertenecer a un tipo concreto frente a pertenecer al normal. Además, las variables que influyen en cada uno de estos modelos son las numéricas ("total", puntos de salud, ataque, etc.).
+
+## 5.3. Validación del modelo
+
+Para este apartado, vamos a obtener predicciones con el modelo entrenado, tanto en instancias de entrenamiento como de test. Así, podremos ver su funcionamiento tanto con los datos con los que se ha construido, como con otros datos desconocidos (pero para los cuales tenemos sus valores reales del tipo). El objetivo es estudiar si el modelo ofrece buenas predicciones en general, o si, por el contrario, subajusta o sobreajusta.

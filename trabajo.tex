@@ -1950,6 +1950,7 @@ ofrecer su matriz de confusión:
 \centering
 \caption{Resumen de clasificación}
 \centering
+\fontsize{9}{11}\selectfont
 \begin{tabular}[t]{lrrrr}
 \toprule
   & Clasificados en 1 & Clasificados en 2 & Clasificados en 3 & Clasificados en 4\\
@@ -2219,6 +2220,19 @@ suficiente relación entre el tipo y las otras variables.
 
 \section{5.1. Tratamiento de los datos}\label{tratamiento-de-los-datos}
 
+Antes de nada, debemos pasar las variables: \texttt{generation} y
+\texttt{category} a tipo ``factor'' para poder tratarlas como variables
+categóricas, dado que son variables que usaremos como predictores y que
+toman valores de tipo cadena de texto.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{d\_regresion }\OtherTok{\textless{}{-}}\NormalTok{ d[,}\DecValTok{2}\SpecialCharTok{:}\DecValTok{11}\NormalTok{]}
+\NormalTok{d\_regresion}\SpecialCharTok{$}\NormalTok{category }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(d\_regresion}\SpecialCharTok{$}\NormalTok{category)}
+\NormalTok{d\_regresion}\SpecialCharTok{$}\NormalTok{generation }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(d\_regresion}\SpecialCharTok{$}\NormalTok{generation)}
+\end{Highlighting}
+\end{Shaded}
+
 Dado que estamos en aprendizaje supervisado y contamos con un dataset
 con muchos datos, es convieniente hacer una división en conjunto de
 entranamiento y conjunto de test (\emph{train-test split}). Esto nos
@@ -2272,6 +2286,23 @@ que caen en la partición de \emph{training}, y otros que caigan en la de
 \bottomrule
 \end{tabular}
 \end{table}
+
+Además, para completar el estudio inicial y enfocarlo a la clasificación
+que queremos hacer, podemos representar los diagramas de caja de la
+variable ``total'' para los distintos tipos. Recurrimos en este caso a
+la librería \texttt{tidyverse} para usar comandos de \texttt{ggplot},
+que facilita la representación en este tipo de situaciones donde la
+variable categórica toma muchos valores.
+
+\includegraphics{trabajo_files/figure-pdf/unnamed-chunk-62-1.pdf}
+
+Podemos observar que no hay ningún atípico. Los Pokémon de tipo bicho
+(``bug'') son los que tienden a tener una menor suma de estadísticas,
+mientras que el acero (``steel'') destaca como uno de los tipos donde la
+suma es mayor. Observando las medianas, cerca de estos últimos se
+encontrarían los Pokémon de tipo dragón o volador. Parece que las
+pequeñas tendencias observadas tienen sentido. Es decir, es razonable
+pensar que puede haber cierta relación entre el tipo y las estadísticas.
 
 
 
