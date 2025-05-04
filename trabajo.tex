@@ -2366,6 +2366,309 @@ tenemos sus valores reales del tipo). El objetivo es estudiar si el
 modelo ofrece buenas predicciones en general, o si, por el contrario,
 subajusta o sobreajusta.
 
+No obstante, antes de nada, vamos a medir la significación del modelo
+comparando la devianza del modelo completo frente a la del nulo.
+Trabajamos con el conjunto de entrenamiento. Esta diferencia sigue una
+distribución Chi-cuadrado con grados de libertad dados por
+\(n-1 - (n-k-1)\), siendo \(n\) el tamaño de la muestra con la que
+trabajamos, y \(k\) el número de coeficientes usados en la regresión. A
+partir de de esto, obtenemos un p-valor que nos permite validar o
+rechazar la hipótesis de no significatividad del modelo:
+
+\begin{verbatim}
+# weights:  36 (17 variable)
+initial  value 2370.104841 
+iter  10 value 2232.434759
+iter  20 value 2227.382725
+final  value 2227.358203 
+converged
+\end{verbatim}
+
+\begin{verbatim}
+[1] 9.409857e-108
+\end{verbatim}
+
+Vemos que el p-valor nos sale prácticamente 0, por lo que no tenemos
+evidencia suficiente como para rechazar la hipótesis nula de no
+significatividad, concluyendo que el modelo obtenido con el proceso
+``backward'' es significativo.
+
+Ahora pasamos a hacer predicciones con el modelo. Como pruebas
+individuales, vamos a tomar dos Pokémon cualesquiera, uno del conjunto
+de entrenamiento y otro del de test, para ver cómo funciona. Por
+supuesto, esto no será relevante a la hora de estimar la bondad del
+modelo, dado que solo estamos evaluándolo con un dato de cada conjunto.
+
+La estimación para Charizard, del conjunto de test, sale:
+
+\begin{verbatim}
+     normal         bug        dark      dragon    electric       fairy 
+0.048621620 0.054310673 0.040373003 0.039494690 0.122725001 0.033913282 
+   fighting        fire      flying       ghost       grass      ground 
+0.001584545 0.111331715 0.008953698 0.044196123 0.096253750 0.002909087 
+        ice      poison     psychic        rock       steel       water 
+0.036008936 0.037933810 0.126658796 0.015332117 0.023733476 0.155665678 
+\end{verbatim}
+
+\begin{table}[H]
+\centering
+\caption{Probabilidades de pertenencia de Charizard a cada tipo}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{lr}
+\toprule
+  & x\\
+\midrule
+\cellcolor{gray!10}{normal} & \cellcolor{gray!10}{0.0486216}\\
+bug & 0.0543107\\
+\cellcolor{gray!10}{dark} & \cellcolor{gray!10}{0.0403730}\\
+dragon & 0.0394947\\
+\cellcolor{gray!10}{electric} & \cellcolor{gray!10}{0.1227250}\\
+\addlinespace
+fairy & 0.0339133\\
+\cellcolor{gray!10}{fighting} & \cellcolor{gray!10}{0.0015845}\\
+fire & 0.1113317\\
+\cellcolor{gray!10}{flying} & \cellcolor{gray!10}{0.0089537}\\
+ghost & 0.0441961\\
+\addlinespace
+\cellcolor{gray!10}{grass} & \cellcolor{gray!10}{0.0962537}\\
+ground & 0.0029091\\
+\cellcolor{gray!10}{ice} & \cellcolor{gray!10}{0.0360089}\\
+poison & 0.0379338\\
+\cellcolor{gray!10}{psychic} & \cellcolor{gray!10}{0.1266588}\\
+\addlinespace
+rock & 0.0153321\\
+\cellcolor{gray!10}{steel} & \cellcolor{gray!10}{0.0237335}\\
+water & 0.1556657\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Podemos observar en las probabilidades de pertenencia son altas en los
+tipos: eléctrico, fuego, psíquico y agua; siendo el tipo agua el que
+prevalecería. No obstante, Charizard es de tipo fuego, por lo que se
+trata de un fallo. Aun así, la probabilidad de pertenencia al tipo fuego
+es de las más altas, por lo que el modelo se queda cerca. Los fallos son
+comprensibles debido a la gran cantidad de tipos (clases) que hay, ya
+que las diferencias entre una clase y otra terminan siendo por
+centésimas o milésimas en la probabilidad obtenida.
+
+Estudiamos ahora las probabilidades de pertenencia a cada tipo del
+Pokémon Cacturne, de tipo planta, perteneciente al conjunto de
+entrenamiento:
+
+\begin{verbatim}
+     normal         bug        dark      dragon    electric       fairy 
+0.015458943 0.028547157 0.061475738 0.093581081 0.121958245 0.010763158 
+   fighting        fire      flying       ghost       grass      ground 
+0.002402640 0.185367676 0.003206356 0.053124570 0.195028543 0.002601994 
+        ice      poison     psychic        rock       steel       water 
+0.011406729 0.011248768 0.043917769 0.030651685 0.018030820 0.111228128 
+\end{verbatim}
+
+\begin{table}[H]
+\centering
+\caption{Probabilidades de pertenencia de Cacturne a cada tipo}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{lr}
+\toprule
+  & x\\
+\midrule
+\cellcolor{gray!10}{normal} & \cellcolor{gray!10}{0.0154589}\\
+bug & 0.0285472\\
+\cellcolor{gray!10}{dark} & \cellcolor{gray!10}{0.0614757}\\
+dragon & 0.0935811\\
+\cellcolor{gray!10}{electric} & \cellcolor{gray!10}{0.1219582}\\
+\addlinespace
+fairy & 0.0107632\\
+\cellcolor{gray!10}{fighting} & \cellcolor{gray!10}{0.0024026}\\
+fire & 0.1853677\\
+\cellcolor{gray!10}{flying} & \cellcolor{gray!10}{0.0032064}\\
+ghost & 0.0531246\\
+\addlinespace
+\cellcolor{gray!10}{grass} & \cellcolor{gray!10}{0.1950285}\\
+ground & 0.0026020\\
+\cellcolor{gray!10}{ice} & \cellcolor{gray!10}{0.0114067}\\
+poison & 0.0112488\\
+\cellcolor{gray!10}{psychic} & \cellcolor{gray!10}{0.0439178}\\
+\addlinespace
+rock & 0.0306517\\
+\cellcolor{gray!10}{steel} & \cellcolor{gray!10}{0.0180308}\\
+water & 0.1112281\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En este caso, está bastante claro que el tipo con más probabilidad es el
+planta (``grass''). El modelo estima con un 20\% de seguridad (frente al
+resto de clases) que Cacturne es de tipo planta, tratándose entonces de
+un acierto.
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=2.08333in,height=\textheight]{trabajo_images/cacturne.jpg}
+
+}
+
+\caption{Cacturne, Pokémon de tipo planta perteneciente a nuestro
+conjunto de entrenamiento, que el modelo clasifica correctamente.}
+
+\end{figure}%
+
+Podemos tratar de realizar un análisis más detallado obteniendo las
+matrices de confusión del dataset de training y de test. Cabe tener en
+cuenta que en las columnas se indica el valor de las predicciones y, en
+las filas, el real.
+
+\begin{table}[H]
+\centering
+\caption{Matriz de confusión en training}
+\centering
+\fontsize{4}{6}\selectfont
+\begin{tabular}[t]{lrrrrrrrrrrrrrrrrrr}
+\toprule
+  & normal & bug & dark & dragon & electric & fairy & fighting & fire & flying & ghost & grass & ground & ice & poison & psychic & rock & steel & water\\
+\midrule
+\cellcolor{gray!10}{normal} & \cellcolor{gray!10}{56} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{31}\\
+bug & 13 & 15 & 0 & 2 & 5 & 0 & 2 & 0 & 0 & 0 & 9 & 0 & 0 & 0 & 4 & 7 & 0 & 19\\
+\cellcolor{gray!10}{dark} & \cellcolor{gray!10}{6} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{10}\\
+dragon & 5 & 2 & 0 & 4 & 1 & 0 & 3 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 3 & 2 & 1 & 5\\
+\cellcolor{gray!10}{electric} & \cellcolor{gray!10}{9} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{9} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{6} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{14}\\
+\addlinespace
+fairy & 3 & 2 & 0 & 0 & 2 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 7 & 0 & 0 & 9\\
+\cellcolor{gray!10}{fighting} & \cellcolor{gray!10}{12} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{6} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3}\\
+fire & 9 & 0 & 0 & 2 & 2 & 0 & 1 & 2 & 0 & 0 & 4 & 0 & 0 & 0 & 5 & 0 & 3 & 18\\
+\cellcolor{gray!10}{flying} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3}\\
+ghost & 4 & 3 & 0 & 0 & 2 & 0 & 0 & 0 & 0 & 3 & 4 & 1 & 0 & 0 & 5 & 2 & 1 & 5\\
+\addlinespace
+\cellcolor{gray!10}{grass} & \cellcolor{gray!10}{11} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{13} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{5} & \cellcolor{gray!10}{7} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{35}\\
+ground & 12 & 3 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 6 & 0 & 0 & 0 & 7 & 0 & 3\\
+\cellcolor{gray!10}{ice} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{5} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{10}\\
+poison & 11 & 3 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 2 & 0 & 2 & 7\\
+\cellcolor{gray!10}{psychic} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{14} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{23}\\
+\addlinespace
+rock & 5 & 5 & 0 & 1 & 0 & 0 & 2 & 0 & 0 & 1 & 2 & 3 & 0 & 0 & 2 & 13 & 3 & 8\\
+\cellcolor{gray!10}{steel} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{6} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{5} & \cellcolor{gray!10}{6} & \cellcolor{gray!10}{2}\\
+water & 21 & 5 & 0 & 0 & 5 & 2 & 0 & 0 & 0 & 0 & 8 & 0 & 0 & 0 & 4 & 5 & 0 & 63\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Matriz de confusión en test}
+\centering
+\fontsize{4}{6}\selectfont
+\begin{tabular}[t]{lrrrrrrrrrrrrrrrrrr}
+\toprule
+  & normal & bug & dark & dragon & electric & fairy & fighting & fire & flying & ghost & grass & ground & ice & poison & psychic & rock & steel & water\\
+\midrule
+\cellcolor{gray!10}{bug} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2}\\
+dark & 4 & 0 & 0 & 1 & 2 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 4\\
+\cellcolor{gray!10}{dragon} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3}\\
+electric & 1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 5 & 0 & 0 & 5\\
+\cellcolor{gray!10}{fairy} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1}\\
+\addlinespace
+fighting & 5 & 2 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 2 & 0 & 1\\
+\cellcolor{gray!10}{fire} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{13}\\
+flying & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+\cellcolor{gray!10}{ghost} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{2}\\
+grass & 2 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 5 & 0 & 0 & 0 & 2 & 0 & 0 & 12\\
+\addlinespace
+\cellcolor{gray!10}{ground} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{2} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0}\\
+ice & 2 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 3\\
+\cellcolor{gray!10}{normal} & \cellcolor{gray!10}{11} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{4}\\
+poison & 2 & 2 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 7\\
+\cellcolor{gray!10}{psychic} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1}\\
+\addlinespace
+rock & 2 & 3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 2 & 1 & 3\\
+\cellcolor{gray!10}{steel} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{3} & \cellcolor{gray!10}{1} & \cellcolor{gray!10}{2}\\
+water & 8 & 2 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 1 & 1 & 5\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Aunque la representación no es muy clara debido a las dimensiones de la
+matriz y el amplio número de clases, podemos obtener algunas
+conclusiones:
+
+\begin{itemize}
+\item
+  En \emph{training}, el modelo tiende a equivocarse en Pokémon de tipo
+  agua. Es decir, hay muchos Pokémon de este tipo que el modelo
+  clasifica en otros grupos. No obstante, también hay muchos Pokémon de
+  tipo agua que acierta. En \emph{test}, se puede observar también esta
+  tendencia.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trainData[}\FunctionTok{which}\NormalTok{(trainDataReg}\SpecialCharTok{$}\NormalTok{primary\_type }\SpecialCharTok{==} \StringTok{"poison"}\NormalTok{), ]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+            name primary_type generation    category total_base_stats  hp
+435     skuntank       poison      gen 4     regular              479 103
+453     croagunk       poison      gen 4     regular              300  48
+24         arbok       poison      gen 1     regular              448  60
+452      drapion       poison      gen 4     regular              500  70
+34      nidoking       poison      gen 1     regular              505  81
+42        golbat       poison      gen 1     regular              455  75
+109      koffing       poison      gen 1     regular              340  40
+1016 fezandipiti       poison      gen 9   legendary              555  88
+569     garbodor       poison      gen 5     regular              474  80
+1025   pecharunt       poison      gen 9    mythical              600  88
+804    naganadel       poison      gen 7 ultra beast              540  73
+944     shroodle       poison      gen 9     regular              290  40
+690       skrelp       poison      gen 6     regular              320  50
+1015   munkidori       poison      gen 9   legendary              555  88
+691     dragalge       poison      gen 6     regular              494  65
+29     nidoran-f       poison      gen 1     regular              275  55
+316       gulpin       poison      gen 3     regular              302  70
+454    toxicroak       poison      gen 4     regular              490  83
+890    eternatus       poison      gen 8   legendary              690 140
+945     grafaiai       poison      gen 9     regular              485  63
+169       crobat       poison      gen 2     regular              535  85
+89           muk       poison      gen 1     regular              500 105
+88        grimer       poison      gen 1     regular              325  80
+32     nidoran-m       poison      gen 1     regular              273  46
+41         zubat       poison      gen 1     regular              245  40
+748      toxapex       poison      gen 7     regular              495  50
+110      weezing       poison      gen 1     regular              490  65
+33      nidorino       poison      gen 1     regular              365  61
+     attack defense special_attack special_defense speed
+435      93      67             71              61    84
+453      61      40             61              40    50
+24       95      69             65              79    80
+452      90     110             60              75    95
+34      102      77             85              75    85
+42       80      70             65              75    90
+109      65      95             60              45    35
+1016     91      82             70             125    99
+569      95      82             60              82    75
+1025     88     160             88              88    88
+804      73      73            127              73   121
+944      65      35             40              35    75
+690      60      60             60              60    30
+1015     75      66            130              90   106
+691      75      90             97             123    44
+29       47      52             40              40    41
+316      43      53             43              53    40
+454     106      65             86              65    85
+890      85      95            145              95   130
+945      95      65             80              72   110
+169      90      80             70              80   130
+89      105      75             65             100    50
+88       80      50             40              50    25
+32       57      40             40              40    50
+41       45      35             30              40    55
+748      63     152             53             142    35
+110      90     120             85              70    60
+33       72      57             55              55    65
+\end{verbatim}
+\end{itemize}
+
 
 
 

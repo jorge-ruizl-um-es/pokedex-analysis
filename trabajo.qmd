@@ -62,7 +62,15 @@ bookdown: true
 
     4.3. Conclusiones
 
-5.  Regresión Lineal Múltiple
+5.  Regresión Logística/Multinomial
+
+    5.1. Tratamiento de los datos
+
+    5.2. Entrenamiento del modelo
+
+    5.3. Validación del modelo
+
+6.  Conclusiones
 
 # 1. Introducción y contexto
 
@@ -1063,7 +1071,7 @@ d_regresion %>%
 
 Podemos observar que no hay ningún atípico. Los Pokémon de tipo bicho ("bug") son los que tienden a tener una menor suma de estadísticas, mientras que el acero ("steel") destaca como uno de los tipos donde la suma es mayor. Observando las medianas, cerca de estos últimos se encontrarían los Pokémon de tipo dragón o volador. Parece que las pequeñas tendencias observadas tienen sentido. Es decir, es razonable pensar que puede haber cierta relación entre el tipo y las estadísticas.
 
-![Figura de Charizard a escala en el Pokémon Center de Tokio (Japón). Charizard es un Pokémon de primera generación que hemos obtenido como parte del conjunto de test.](trabajo_images/charizard.jpeg){alt="Mienshao, de tipo lucha. Observamos que, aparentemente, parece que encaja también en el estilo del equipo que teníamos, con Pokémon de apariencia ágil y gran capacidad ofensiva (cosa que sus estadísticas corroboran)." fig-cap="Pokémon Chansey y Blissey, destacables por su alto nivel de salud (hp)" fig-align="center" width="230"}
+![Figura de Charizard a escala en el Pokémon Center de Tokio (Japón). Charizard es un Pokémon de primera generación que hemos obtenido como parte del conjunto de test.](trabajo_images/charizard.jpeg){fig-cap="Pokémon Chansey y Blissey, destacables por su alto nivel de salud (hp)" fig-align="center" width="230"}
 
 ## 5.2. Entrenamiento del modelo
 
@@ -1104,3 +1112,101 @@ Así, obtenemos como resultado 17 modelos, uno por cada clase que no sea la de r
 ## 5.3. Validación del modelo
 
 Para este apartado, vamos a obtener predicciones con el modelo entrenado, tanto en instancias de entrenamiento como de test. Así, podremos ver su funcionamiento tanto con los datos con los que se ha construido, como con otros datos desconocidos (pero para los cuales tenemos sus valores reales del tipo). El objetivo es estudiar si el modelo ofrece buenas predicciones en general, o si, por el contrario, subajusta o sobreajusta.
+
+No obstante, antes de nada, vamos a medir la significación del modelo comparando la devianza del modelo completo frente a la del nulo. Trabajamos con el conjunto de entrenamiento. Esta diferencia sigue una distribución Chi-cuadrado con grados de libertad dados por $n-1 - (n-k-1)$, siendo $n$ el tamaño de la muestra con la que trabajamos, y $k$ el número de coeficientes usados en la regresión. A partir de de esto, obtenemos un p-valor que nos permite validar o rechazar la hipótesis de no significatividad del modelo:
+
+```{r}
+#| echo: false
+#| output: false
+
+modelo_nulo <- multinom(primary_type ~ 1, data = trainDataReg)
+```
+
+```{r}
+#| echo: false
+
+modelo_nulo <- multinom(primary_type ~ 1, data = trainDataReg)
+dif_devianzas <- modelo_nulo$deviance - modelo_backward$deviance
+grados_libertad <- 819 - 812
+p_valor <- pchisq(dif_devianzas, df = grados_libertad, lower.tail = FALSE)
+p_valor
+```
+
+Vemos que el p-valor nos sale prácticamente 0, por lo que no tenemos evidencia suficiente como para rechazar la hipótesis nula de no significatividad, concluyendo que el modelo obtenido con el proceso "backward" es significativo.
+
+Ahora pasamos a hacer predicciones con el modelo. Como pruebas individuales, vamos a tomar dos Pokémon cualesquiera, uno del conjunto de entrenamiento y otro del de test, para ver cómo funciona. Por supuesto, esto no será relevante a la hora de estimar la bondad del modelo, dado que solo estamos evaluándolo con un dato de cada conjunto.
+
+La estimación para Charizard, del conjunto de test, sale:
+
+```{r}
+#| echo: false
+charizard <- testDataReg[2,4:10]
+predict(modelo_backward, newdata = charizard, type="probs")
+
+kable(predict(modelo_backward, newdata = charizard, type="probs"), format = "latex", caption = "Probabilidades de pertenencia de Charizard a cada tipo", booktabs = TRUE) %>%
+  kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
+```
+
+Podemos observar en las probabilidades de pertenencia son altas en los tipos: eléctrico, fuego, psíquico y agua; siendo el tipo agua el que prevalecería. No obstante, Charizard es de tipo fuego, por lo que se trata de un fallo. Aun así, la probabilidad de pertenencia al tipo fuego es de las más altas, por lo que el modelo se queda cerca. Los fallos son comprensibles debido a la gran cantidad de tipos (clases) que hay, ya que las diferencias entre una clase y otra terminan siendo por centésimas o milésimas en la probabilidad obtenida.
+
+Estudiamos ahora las probabilidades de pertenencia a cada tipo del Pokémon Cacturne, de tipo planta, perteneciente al conjunto de entrenamiento:
+
+```{r}
+#| echo: false
+cacturne <- trainDataReg[1,4:10]
+predict(modelo_backward, newdata = cacturne, type="probs")
+
+kable(predict(modelo_backward, newdata = cacturne, type="probs"), format = "latex", caption = "Probabilidades de pertenencia de Cacturne a cada tipo", booktabs = TRUE) %>%
+  kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
+```
+
+En este caso, está bastante claro que el tipo con más probabilidad es el planta ("grass"). El modelo estima con un 20% de seguridad (frente al resto de clases) que Cacturne es de tipo planta, tratándose entonces de un acierto.
+
+![Cacturne, Pokémon de tipo planta perteneciente a nuestro conjunto de entrenamiento, que el modelo clasifica correctamente.](trabajo_images/cacturne.jpg){alt="Figura de Charizard a escala en el Pokémon Center de Tokio (Japón). Charizard es un Pokémon de primera generación que hemos obtenido como parte del conjunto de test." fig-cap="Pokémon Chansey y Blissey, destacables por su alto nivel de salud (hp)" fig-align="center" width="200"}
+
+Podemos tratar de realizar un análisis más detallado obteniendo las matrices de confusión del dataset de training y de test. Cabe tener en cuenta que en las columnas se indica el valor de las predicciones y, en las filas, el real.
+
+```{r}
+#| echo: false
+predicciones_train <- predict(modelo_backward, newdata = trainDataReg, "class")
+matriz_conf_train <- table(trainDataReg$primary_type, predicciones_train, dnn=c("real", "predicho"))
+
+kable(matriz_conf_train, format = "latex", caption = "Matriz de confusión en training", booktabs = TRUE) %>%
+  kable_styling(font_size = 4, latex_options = c("striped", "HOLD_position", "small")) 
+```
+
+```{r}
+#| echo: false
+predicciones_test <- predict(modelo_backward, newdata = testDataReg, "class")
+matriz_conf_test <- table(testDataReg$primary_type, predicciones_test, dnn=c("real", "predicho"))
+
+kable(matriz_conf_test, format = "latex", caption = "Matriz de confusión en test", booktabs = TRUE) %>%
+  kable_styling(font_size = 4, latex_options = c("striped", "HOLD_position", "small")) 
+```
+
+Aunque la representación no es muy clara debido a las dimensiones de la matriz y el amplio número de clases, podemos obtener algunas conclusiones:
+
+-   En *training*, el modelo tiende a equivocarse en Pokémon de tipo agua. Concretamente, se tiende a predecir tipo agua con mucha más frecuencia que los demás, lo que hace que muchas observaciones en todos los grupos se clasifiquen mal como "falsos tipo agua". Quizás se podría solucionar penalizando la clasificación en tipo agua de alguna forma, para que sólo se clasificaran como agua aquellos Pokémon que tengan una probabilidad especialmente alta en ese tipo. En *test*, se puede observar también esta tendencia.
+
+-   Algo similar ocurre con el tipo "normal". En ambos casos, hay bastantes aciertos (es decir, Pokémon de tipo agua o normal que detecta como tal). Por tanto, podemos decir que el modelo detecta aceptablemente las observaciones de tipo normal y agua, pero su fiabilidad al predecir estos dos tipos es baja. Esto es signo de alta sensibilidad pero baja precisión en estas dos clases.
+
+-   Este fenómeno en esas dos clases provoca que, tanto en *training* como más notablemente en *test*, las predicciones en el resto de clases tengan un rendimiento bastante malo. Esto se debe a la acumulación de errores al predecir "normal" y "agua", ya que hace que no haya suficientes predicciones en el resto de tipos y, por tanto, no se acierte en ellos.
+
+-   No obstante, podemos pensar que, como nos ha ocurrido en el fallo de antes, es posible que, en los fallos, la probabilidad de pertenencia al tipo verdadero destaque sobre las demás (aunque la probabilidad del tipo erróneo la supere, tal como ocurría con Charizard). Si midiéramos el rendimiento a través de las probabilidades, u ofreciéramos como salida los dos o tres posibles tipos más probables, quizás obtendríamos mejores resultados.
+
+Por último, podemos calcular la *accuracy* (exactitud) como el grado de acierto general del modelo en *training* y *test*. Esta medida no será muy representativa, ya que hemos visto que las clases no están equilibradas y el modelo funciona mejor para los tipos "normal" y "agua". Aun así, la *accuracy* en *training* es de:
+
+```{r}
+#| echo: false
+accuracy_train <- sum(diag(matriz_conf_train)) / sum(matriz_conf_train)
+accuracy_train
+```
+
+Y en *test* es de:
+
+```{r}
+accuracy_test <- sum(diag(matriz_conf_test)) / sum(matriz_conf_test)
+accuracy_test
+```
+
+Podemos observar que, a pesar del mejor funcionamiento del modelo en algunas clases, obtenemos un rendimiento bastante malo. Además, percibimos un claro sobreajuste del modelo a los datos de entrenamiento, debido a que el rendimiento en test es pésimo.
