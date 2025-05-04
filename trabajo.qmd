@@ -1125,7 +1125,6 @@ modelo_nulo <- multinom(primary_type ~ 1, data = trainDataReg)
 ```{r}
 #| echo: false
 
-modelo_nulo <- multinom(primary_type ~ 1, data = trainDataReg)
 dif_devianzas <- modelo_nulo$deviance - modelo_backward$deviance
 grados_libertad <- 819 - 812
 p_valor <- pchisq(dif_devianzas, df = grados_libertad, lower.tail = FALSE)
@@ -1141,20 +1140,18 @@ La estimación para Charizard, del conjunto de test, sale:
 ```{r}
 #| echo: false
 charizard <- testDataReg[2,4:10]
-predict(modelo_backward, newdata = charizard, type="probs")
 
 kable(predict(modelo_backward, newdata = charizard, type="probs"), format = "latex", caption = "Probabilidades de pertenencia de Charizard a cada tipo", booktabs = TRUE) %>%
   kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
 ```
 
-Podemos observar en las probabilidades de pertenencia son altas en los tipos: eléctrico, fuego, psíquico y agua; siendo el tipo agua el que prevalecería. No obstante, Charizard es de tipo fuego, por lo que se trata de un fallo. Aun así, la probabilidad de pertenencia al tipo fuego es de las más altas, por lo que el modelo se queda cerca. Los fallos son comprensibles debido a la gran cantidad de tipos (clases) que hay, ya que las diferencias entre una clase y otra terminan siendo por centésimas o milésimas en la probabilidad obtenida.
+Podemos observar que las probabilidades de pertenencia son altas en los tipos: eléctrico, fuego, psíquico y agua; siendo el tipo agua el que prevalecería. No obstante, Charizard es de tipo fuego, por lo que se trata de un fallo. Aun así, la probabilidad de pertenencia al tipo fuego es de las más altas, por lo que el modelo se queda cerca. Los fallos son comprensibles debido a la gran cantidad de tipos (clases) que hay, ya que las diferencias entre una clase y otra terminan siendo por centésimas o milésimas en la probabilidad obtenida.
 
 Estudiamos ahora las probabilidades de pertenencia a cada tipo del Pokémon Cacturne, de tipo planta, perteneciente al conjunto de entrenamiento:
 
 ```{r}
 #| echo: false
 cacturne <- trainDataReg[1,4:10]
-predict(modelo_backward, newdata = cacturne, type="probs")
 
 kable(predict(modelo_backward, newdata = cacturne, type="probs"), format = "latex", caption = "Probabilidades de pertenencia de Cacturne a cada tipo", booktabs = TRUE) %>%
   kable_styling(font_size = 9, latex_options = c("striped", "HOLD_position", "small")) 
@@ -1205,8 +1202,25 @@ accuracy_train
 Y en *test* es de:
 
 ```{r}
+#| echo: false
 accuracy_test <- sum(diag(matriz_conf_test)) / sum(matriz_conf_test)
 accuracy_test
 ```
 
 Podemos observar que, a pesar del mejor funcionamiento del modelo en algunas clases, obtenemos un rendimiento bastante malo. Además, percibimos un claro sobreajuste del modelo a los datos de entrenamiento, debido a que el rendimiento en test es pésimo.
+
+Concluímos que, si nos quedamos exclusivamente con la salida del regresor multinomial, el modelo que obtenemos no es para nada útil en la identificación del tipo de los Pokémon. Podríamos ver si las probabilidades que se obtienen al aplicar el modelo nos dan alguna información relevante.
+
+# 6. Conclusiones
+
+El análisis estadístico de la Pokédex nacional ha permitido explorar las características de los Pokémon desde diferentes perspectivas, revelando patrones y relaciones ocultas en los datos. A través del uso de técnicas multivariantes, como el análisis de componentes principales y el análisis de cluster, hemos identificado patrones y agrupamientos significativos entre los Pokémon, que no solo reflejan sus estadísticas generales, sino también su tipología y categoría.
+
+La segmentación de los Pokémon en función de sus estadísticas ya ha revelado ciertas relaciones ocultas en forma de distinciones en función de la categoría (grupos reducidos de Pokémon aparentemente superiores en términos generales). La identificación de estos patrones es crucial para la planificación estratégica en los combates, ya que proporciona una base sólida para seleccionar los Pokémon más adecuados según sus características.
+
+Además, el análisis de componentes principales ha permitido reducir la dimensionalidad del conjunto de datos, conservando la mayor parte de la información relevante. Esto nos ha permitido visualizar mejor todo el conjunto de datos e interpretar las relaciones entre todas las variables.
+
+Por su parte, quizás el punto más importante del trabajo ha sido la implementación completa de un sistema de recomendación automática e inteligente de Pokémon basado en análisis cluster. Se ha conseguido identificar grupos de Pokémon en base puramente a sus estadísticas, y se ha procedido a su interpretación exhaustiva, para lo cual el análisis de componentes principales ha jugado un papel primordial. Esta ha sido la base del algoritmo propuesto, donde se ha incorporado también análisis discriminante, y que ha terminado teniendo bastante éxito y una muy acentuada aplicación práctica. Se ha puesto de manifiesto cómo la combinación de tres técnicas básicas de estadística multivariante puede dar lugar a un método relativamente sencillo y muy eficaz que permite a un jugador inexperto completar su equipo Pokémon en base a distintos criterios. Por supuesto, es extensible a otros ámbitos fuera de los videojuegos: equipos deportivos, aplicaciones de música online, plataformas de *streaming*, etc.
+
+Finalmente, el uso de la regresión multinomial, aplicada para clasificar a los Pokémon según su tipo principal, ha añadido una capa supervisada al análisis. Este enfoque nos ha permitido construir un modelo predictivo que, aunque presenta ciertas limitaciones en cuanto a precisión y rendimiento debido a la gran cantidad de tipos posibles, ha mostrado cómo las variables numéricas influyen significativamente en la clasificación de los Pokémon por tipo. Puede que, cambiando el enfoque en la interpretación o presentación de los resultados, dé lugar a una herramienta más útil; aunque también es un ejemplo de cómo no todas las técnicas son directamente aplicables en cualquier dataset.
+
+En conjunto, este trabajo ilustra cómo las técnicas estadísticas pueden aplicarse a contextos diversos, incluso en entornos lúdicos, para extraer información valiosa y apoyar la toma de decisiones. Más allá, hemos observado cómo el éxito de una franquicia que se ha mantenido en boca de todos durante las últimas tres décadas no es cuestión de suerte, sino que encierra una compleja base matemática y estadística. Estas páginas son tan solo la "punta del iceberg" de la complejidad que entrañan estos juegos, y aún queda un enorme número de variables y relaciones a explorar con las que podemos aplicar infinidad de distintas técnicas y obtener resultados de mayor calibre.
