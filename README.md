@@ -5,7 +5,7 @@ This project presents a comprehensive analysis of the National Pokédex using R,
 ### Environment:
 This project has been developed using **R**, a powerful language for statistical computing and data analysis. Specifically, the development environment used is **RStudio**. To enhance the reproducibility and presentation of the analysis, we have utilized **Quarto** notebooks, a flexible tool that supports **LaTeX**. These tools have enabled us to present statistical formulas, concepts and results in a clean and easy-to-understand way. 
 
-The combination of RStudio and Quarto provides a robust workflow for data exploration, model development, and documentation, ensuring that all steps of the analysis are well-documented and reproducible.
+The combination of RStudio and Quarto provides a robust workflow for data exploration, model development, and documentation, ensuring that all steps of the analysis are well-documented and reproducible. All the code of the project is contained in the Quarto notebook, where it is directly executable. 
 
 ### Key Features:
 - **Exploratory Data Analysis (EDA)**: Includes in-depth visualizations and statistical summaries to provide insights into various Pokémon categories, types, and their attributes.
@@ -16,7 +16,7 @@ The combination of RStudio and Quarto provides a robust workflow for data explor
 
 - **Regression**: Applies regression models to understand relationships between different Pokémon attributes.
 
-### Techniques Used:
+### Used Techniques:
 - Principal Component Analysis (PCA)
 
 - K-means an Hierarchical Clustering
