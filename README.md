@@ -44,4 +44,4 @@ Among other features, the project serves as a foundational tool for taking a fir
 
 ### Credits
 
-Developed by Jorge Ruiz López ([jorge.rulo2005@gmail.com](jorge.rulo2005@gmail.com)) with educational and technical purposes, as well as for putting into practice my abilities. 
+Developed by Jorge Ruiz López ([jorge.rulo2005@gmail.com](mailto:jorge.rulo2005@gmail.com)) with educational and technical purposes, as well as for putting into practice my abilities. 
